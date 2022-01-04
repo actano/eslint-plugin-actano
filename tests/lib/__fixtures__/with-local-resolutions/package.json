@@ -1,0 +1,19 @@
+{
+  "name": "with-local-resolutions",
+  "version": "1.0.0",
+  "description": "leftover yarn3 local resolution",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "use-local": "^5.2.0",
+    "debug": "^4.1.0"
+  },
+  "resolutions": {
+    "use-local": "portal:/local-stuff"
+  }
+}
