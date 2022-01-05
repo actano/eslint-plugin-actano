@@ -1,0 +1,54 @@
+library 'jenkins-k8s-pipeline-scripts@v5'
+
+pipeline {
+  agent {
+    label "jenkins-nodejs-12"
+  }
+  stages {
+    stage('Install') {
+      steps {
+        ansiColor('xterm') {
+          container('nodejs') {
+            script {
+              sh "yarn install"
+            }
+          }
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        ansiColor('xterm') {
+          container('nodejs') {
+            script {
+              sh "yarn test"
+            }
+          }
+        }
+      }
+    }
+    stage('Publish') {
+      when {
+        tag "*"
+      }
+      steps {
+        ansiColor('xterm') {
+          container('nodejs') {
+            script {
+              npm.publish()
+            }
+          }
+        }
+      }
+    }
+  }
+  post {
+    failure {
+      sendNotification currentBuild.result, '#morpheus'
+    }
+    fixed {
+      sendNotification currentBuild.result, '#morpheus'
+    }
+  }
+}
+
