@@ -1,25 +1,20 @@
 const assert = require('assert')
-const { CLIEngine } = require('eslint')
+const { ESLint } = require('eslint')
 const path = require('path')
 
 const plugin = require('../../lib')
 
-function execute(scenario, rules, options) {
-  const cli = new CLIEngine(
-    Object.assign(
-      {
-        extensions: ['.json'],
-        baseConfig: {
-          rules,
-        },
-        ignore: false,
-        useEslintrc: false,
-      },
-      options,
-    ),
-  )
-  cli.addPlugin('eslint-plugin-actano', plugin)
-  return cli.executeOnFiles([
+async function execute(scenario, rules) {
+  const eslint = new ESLint({
+    plugins: {'eslint-plugin-actano': plugin},
+    baseConfig: {
+      plugins: ['actano'],
+      rules,
+    },
+    ignore: false,
+    useEslintrc: false,
+  })
+  return await eslint.lintFiles([
     path.join(__dirname, '__fixtures__', scenario, 'package.json'),
   ])
 }
@@ -31,25 +26,27 @@ describe('plugin exports', () => {
   })
 
   describe('should define rules', () => {
-    it('catches local yarn3 resolutions', () => {
-      const { errorCount, fixableErrorCount, results } = execute(
+    it('catches local yarn3 resolutions', async () => {
+      const ruleId = 'actano/no-local-resolutions'
+      const results = await execute(
         'with-local-resolutions',
-        {
-          'actano/no-local-resolutions': 'error',
-        },
+        { [ruleId]: 'error' },
       )
-      assert.equal(errorCount, 1, 'one error')
-      assert.equal(fixableErrorCount, 0, 'not fixable')
       assert.equal(results.length, 1)
-      const { messages } = results[0]
+      const { errorCount, fixableErrorCount, messages } = results[0]
+      console.log(messages)
+      assert.equal(errorCount, 1, 'error count one')
+      assert.equal(fixableErrorCount, 0, 'no fixable errors')
       const [message] = messages
       assert.equal(
         message.ruleId,
-        'actano/no-local-resolutions',
+        ruleId,
+        `wrong rule ${message.ruleId}`,
       )
       assert.equal(
         message.message,
         'Found local yarn3 resolutions',
+        `wrong message ${message.message}`,
       )
     })
   })
