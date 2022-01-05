@@ -2,22 +2,18 @@
  * @fileoverview Disallow yarn3 local resolutions
  * @author Dagmar Timmreck
  */
-'use strict';
+'use strict'
 
-//------------------------------------------------------------------------------
-// Requirements
-//------------------------------------------------------------------------------
-
-var rule = require('../../../lib/rules/no-local-resolutions'),
-    RuleTester = require('eslint').RuleTester;
+const { RuleTester } = require('eslint')
+const rule = require('../../../lib/rules/no-local-resolutions')
 
 //------------------------------------------------------------------------------
 // Valid test cases
 //------------------------------------------------------------------------------
 
 const valid = [
-    {
-        code: `module.exports = {
+  {
+    code: `module.exports = {
   "name": "treat-yo-self",
   "version": "1.1.1",
   "description": "Once a year.",
@@ -26,10 +22,10 @@ const valid = [
     "master"
   ]
 }`,
-        filename: 'package.json'
-    },
-    {
-        code: `module.exports = {
+    filename: 'package.json',
+  },
+  {
+    code: `module.exports = {
   "name": "treat-yo-self",
   "version": "0.1.0",
   "private": true,
@@ -40,14 +36,14 @@ const valid = [
   ]
 }
 `,
-        filename: '/path/to/package.json'
-    },
-    {
-        code: `doStuff({ "not-a-package-json": "so who cares" })`,
-        filename: 'package-lock.json'
-    },
-    {
-        code: `module.exports = {
+    filename: '/path/to/package.json',
+  },
+  {
+    code: `doStuff({ "not-a-package-json": "so who cares" })`,
+    filename: 'package-lock.json',
+  },
+  {
+    code: `module.exports = {
   "version": "1.1.1",
   "name": "treat-yo-self",
   "keywords": [
@@ -60,18 +56,18 @@ const valid = [
   }
 }
 `,
-        filename: 'package.json',
-    }
-];
+    filename: 'package.json',
+  },
+]
 
 //------------------------------------------------------------------------------
 // Invalid test cases
 //------------------------------------------------------------------------------
 
 const invalid = [
-    {
-        code: `module.exports = {
-  "name": "invalid-top-level-property-order",
+  {
+    code: `module.exports = {
+  "name": "with-local-resolution",
   "version": "1.0.0",
   "scripts": {
     "test": "tape"
@@ -86,18 +82,18 @@ const invalid = [
     "some-package": "portal:/to/some/file"
   }
 }`,
-        filename: 'path/to/some/package.json',
-        errors: [
-            {
-                message: 'Found local yarn3 resolutions',
-            },
-        ],
-    },
-];
+    filename: 'path/to/some/package.json',
+    errors: [
+      {
+        message: 'Found local yarn3 resolutions',
+      },
+    ],
+  },
+]
 
 //------------------------------------------------------------------------------
 // Run tests
 //------------------------------------------------------------------------------
 
-var ruleTester = new RuleTester();
-ruleTester.run('order-properties', rule, { valid, invalid });
+const ruleTester = new RuleTester()
+ruleTester.run('no-local-resolutions', rule, { valid, invalid })
